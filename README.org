@@ -1,0 +1,11 @@
+* Dotfiles
+
+Requirements:
+- ~ansible~ to run the ~setup.yml~;
+- ~python3-psutil~, which is needed by ansible to automatically configure the GNOME desktop environment using ~dconf~;
+- you need to be running Fedora Workstation 37;
+Clone this repository, ~cd~ into its directory and run the ~setup.yml~ playbook.
+#+begin_src sh
+  sudo ansible-playbook setup.yml
+#+end_src
+ansible will add some repositories (RPM Fusion and some ~copr~ repos), install all the packages I use, symlink the dotfiles, enable some services and configure GNOME.

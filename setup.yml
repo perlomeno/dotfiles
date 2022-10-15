@@ -1,0 +1,179 @@
+- hosts: localhost
+  tasks:
+    - name: Import RPM Fusion keys
+      ansible.builtin.rpm_key:
+        state: present
+        key: "{{item}}"
+      with_items:
+        - "https://rpmfusion.org/keys?action=AttachFile&do=get&target=RPM-GPG-KEY-rpmfusion-free-fedora-2020"
+        - "https://rpmfusion.org/keys?action=AttachFile&do=get&target=RPM-GPG-KEY-rpmfusion-nonfree-fedora-2020"
+
+    - name: Enable the RPM Fusion repositories
+      ansible.builtin.dnf:
+        name:
+          - "https://download1.rpmfusion.org/free/fedora/rpmfusion-free-release-{{ansible_distribution_major_version}}.noarch.rpm"
+          - "https://download1.rpmfusion.org/nonfree/fedora/rpmfusion-nonfree-release-{{ansible_distribution_major_version}}.noarch.rpm"
+        state: present
+
+    - name: Add copr repositories
+      community.general.copr:
+        name: "{{item}}"
+        state: enabled
+      with_items:
+        - petersen/haskell-language-server
+
+    - name: Add the flathub flatpak repository
+      become: yes
+      become_user: ap
+      community.general.flatpak_remote:
+        name: flathub
+        state: present
+        flatpakrepo_url: https://dl.flathub.org/repo/flathub.flatpakrepo
+        method: user
+
+    - name: Update rpm packages
+      ansible.builtin.dnf:
+        name: "*"
+        state: latest
+
+    - name: Remove unused rpm packages
+      ansible.builtin.dnf:
+        name:
+          - gnome-boxes
+          - gnome-photos
+          - gnome-tour
+          - rhythmbox
+          - totem
+          - yelp
+        state: absent
+
+    - name: Install rpm packages
+      ansible.builtin.dnf:
+        name:
+          # Printer drivers
+          - epson-inkjet-printer-escpr
+          # Stuff to configure GNOME
+          - gnome-shell-extension-appindicator
+          - python3-psutil
+          # GUI Programs
+          - calibre
+          - celluloid
+          - cheese
+          - chromium
+          - foliate
+          - fragments
+          - gcolor3
+          - geary
+          - gimp
+          - gnome-music
+          # Services
+          - syncthing
+          - "@Virtualization"
+          # CLI programs
+          - ffmpeg
+          - ImageMagick
+          - pandoc
+          - youtube-dl
+          - bat
+          - exa
+          - fd-find
+          - ripgrep
+          # Emacs and dependencies
+          - emacs
+          - clang-tools-extra
+          - haskell-language-server
+          - libtool
+          - libvterm
+          - python3-lsp-server
+          - python3-pyflakes
+          - tdlib-devel
+          - libtree-sitter
+          # Development tools
+          - cmake
+          - git
+          - ghc
+          - neovim
+          - stow
+          - valgrind
+          # Texlive
+          - texlive-scheme-small
+          - texlive-capt-of
+          - texlive-circuitikz
+          - texlive-wrapfig
+        state: present
+
+    - name: Install flatpak apps
+      become: yes
+      become_user: ap
+      community.general.flatpak:
+        name:
+          - com.bitwarden.desktop
+          - com.discordapp.Discord
+          - com.github.tchx84.Flatseal
+          - com.obsproject.Studio
+          - com.slack.Slack
+          - com.spotify.Client
+          - org.audacityteam.Audacity
+          - org.geogebra.GeoGebra
+          - org.gnome.World.PikaBackup
+          - org.kde.kdenlive
+          - org.kde.krita
+          - org.telegram.desktop
+          - us.zoom.Zoom
+        method: user
+        remote: flathub
+        state: present
+
+    - name: Create victor-mono directory in "/usr/share/fonts"
+      ansible.builtin.file:
+        path: /usr/share/fonts/victor-mono
+        state: directory
+
+    - name: Download the victor-mono font
+      ansible.builtin.unarchive:
+        remote_src: yes
+        src: https://rubjo.github.io/victor-mono/VictorMonoAll.zip
+        dest: /usr/share/fonts/victor-mono
+
+    - name: Symlink dotfiles
+      become: yes
+      become_user: ap
+      ansible.builtin.command: stow -t ~ {{item}}
+      with_items:
+        - bash
+        - emacs
+        - git
+
+    - name: Add user to the libvirt group
+      ansible.builtin.user:
+        name: ap
+        groups: libvirt
+        append: yes
+
+    - name: Enable syncthing
+      ansible.builtin.service:
+        name: syncthing@ap
+        enabled: yes
+
+    - name: Enable libvirtd
+      ansible.builtin.service:
+        name: libvirtd.service
+        enabled: yes
+
+    - name: Set dconf keys
+      become: yes
+      become_user: ap
+      community.general.dconf:
+        key: "{{item.key}}"
+        value: "{{item.value}}"
+      with_items:
+        - {key: "/org/gnome/desktop/input-sources/xkb-options", value: "['ctrl:swapcaps']"}
+        - {key: "/org/gnome/desktop/peripherals/touchpad/tap-to-click", value: "true"}
+        - {key: "/org/gnome/settings-daemon/plugins/color/night-light-enabled", value: "true"}
+        - {key: "/org/gnome/Console/theme", value: "'auto'"}
+        - {key: "/org/gnome/settings-daemon/plugins/color/night-light-temperature", value: "uint32 3700"}
+        - {key: "/org/gnome/shell/disable-user-extensions", value: "false"}
+        - {key: "/org/gnome/shell/enabled-extensions", value: "['appindicatorsupport@rgcjonas.gmail.com']"}
+        - {key: "/org/gnome/shell/favorite-apps", value: "['gnome-terminal.desktop', 'chromium-browser.desktop', 'emacs.desktop', 'nautilus.desktop']"}
+        - {key: "/org/gnome/shell/app-picker-layout", value: "'[]'"}
+        - {key: "/org/gnome/desktop/interface/monospace-font-name", value: "'Victor Mono 12'"}
