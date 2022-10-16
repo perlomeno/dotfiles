@@ -59,9 +59,7 @@
           - calibre
           - celluloid
           - cheese
-          - chromium
           - foliate
-          - fragments
           - gcolor3
           - geary
           - gimp
@@ -113,7 +111,9 @@
           - com.obsproject.Studio
           - com.slack.Slack
           - com.spotify.Client
+          - de.haeckerfelix.Fragments
           - org.audacityteam.Audacity
+          - org.chromium.Chromium
           - org.geogebra.GeoGebra
           - org.gnome.World.PikaBackup
           - org.kde.kdenlive
@@ -134,6 +134,13 @@
         remote_src: yes
         src: https://rubjo.github.io/victor-mono/VictorMonoAll.zip
         dest: /usr/share/fonts/victor-mono
+
+    - name: Create emacs directory in ~/.config
+      become: yes
+      become_user: ap
+      ansible.builtin.file:
+        path: ~/.config/emacs
+        state: directory
 
     - name: Symlink dotfiles
       become: yes
@@ -174,6 +181,6 @@
         - {key: "/org/gnome/settings-daemon/plugins/color/night-light-temperature", value: "uint32 3700"}
         - {key: "/org/gnome/shell/disable-user-extensions", value: "false"}
         - {key: "/org/gnome/shell/enabled-extensions", value: "['appindicatorsupport@rgcjonas.gmail.com']"}
-        - {key: "/org/gnome/shell/favorite-apps", value: "['gnome-terminal.desktop', 'chromium-browser.desktop', 'emacs.desktop', 'nautilus.desktop']"}
+        - {key: "/org/gnome/shell/favorite-apps", value: "['gnome-terminal.desktop', 'org.chromium.Chromium.desktop', 'emacs.desktop', 'nautilus.desktop']"}
         - {key: "/org/gnome/shell/app-picker-layout", value: "'[]'"}
         - {key: "/org/gnome/desktop/interface/monospace-font-name", value: "'Victor Mono 12'"}
