@@ -12,7 +12,8 @@
 			      ("" "listings"))
    org-latex-listings t
    org-latex-listings-options '(("basicstyle" "\\ttfamily")))
-  (:bind [remap consult-outline] #'consult-org-heading)
+  (:bind [remap consult-outline] #'consult-org-heading
+	 "C-c c" org-latex-export-to-pdf)
   (:hook org-indent-mode
 	 visual-line-mode)
   (:when-loaded (ap/org-font-setup)))
