@@ -97,6 +97,7 @@
           - texlive-scheme-small
           - texlive-capt-of
           - texlive-circuitikz
+          - texlive-nopageno
           - texlive-wrapfig
         state: present
 
