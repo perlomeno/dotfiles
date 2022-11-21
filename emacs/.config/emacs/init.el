@@ -22,5 +22,6 @@
 (require 'ap-chat)
 
 (require 'ap-lang-c)
+(require 'ap-lang-lisp)
 (require 'ap-lang-haskell)
 (require 'ap-lang-python)

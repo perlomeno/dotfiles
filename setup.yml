@@ -92,6 +92,7 @@
           - git
           - ghc
           - neovim
+          - sbcl
           - stow
           - valgrind
           # Texlive
