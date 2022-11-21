@@ -108,7 +108,7 @@
     - name: Install flatpak apps
       become: yes
       become_user: ap
-      community.general.flatpak:
+      community.general.packaging.os.flatpak:
         name:
           - com.bitwarden.desktop
           - com.discordapp.Discord
