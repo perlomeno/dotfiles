@@ -41,7 +41,7 @@
   (:global [remap list-buffers] #'ibuffer-other-window))
 
 (setup (:package embark)
-  (:global "C-:" embark-act
+  (:global "C-." embark-act
 	   "C-;" embark-dwim))
 
 (setup (:package embark-consult)
